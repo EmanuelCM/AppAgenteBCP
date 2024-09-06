@@ -1,5 +1,8 @@
+import 'package:agentebcp/helpers/mostrar_alerta.dart';
+import 'package:agentebcp/services/auth_services.dart';
 import 'package:agentebcp/widget/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -50,9 +53,10 @@ class __FormStateState extends State<_FormState> {
 
   @override
   Widget build(BuildContext context) {
+    final authServices = Provider.of<AuthServices>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
-      padding: const EdgeInsets.symmetric(horizontal: 200),
+      padding: const EdgeInsets.symmetric(horizontal: 70),
       child: Column(children: [
         CustomIpunt(
           icon: Icons.supervised_user_circle_outlined,
@@ -67,9 +71,24 @@ class __FormStateState extends State<_FormState> {
         ),
         BtnAzul(
             colorBtn: Colors.blue,
-            labelBtn: 'Loggin',
+            labelBtn: 'Login',
             labelColor: Colors.white,
-            onPressed: () {})
+            onPressed: authServices.autenticado
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+
+                    final loginok = await authServices.login(
+                        terminalCtrl.text.trim(), passCtrl.text.trim());
+
+                    if (loginok) {
+                      //Todo navegar home
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostrarAlerta(context, 'Login Incorrecto',
+                          'Revise sus credenciales');
+                    }
+                  })
       ]),
     );
   }

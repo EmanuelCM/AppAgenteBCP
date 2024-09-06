@@ -1,5 +1,7 @@
+import 'package:agentebcp/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:agentebcp/models/usuario.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class UsuariosPage extends StatefulWidget {
@@ -15,13 +17,17 @@ class _UsuariosPageState extends State<UsuariosPage> {
     Usuario(
         uid: '1',
         online: true,
+        password: '646464646',
         email: 'sebitasTest@test.com',
-        nombre: 'Sebastian'),
-    Usuario(uid: '2', online: true, email: 'GabyTest@test.com', nombre: 'Gaby'),
-    Usuario(uid: '3', online: false, email: 'EmaTes@test.com', nombre: 'Ema'),
+        nombre: 'Sebastian',
+        terminal: 'H900000',
+        ruc: 1010101010),
   ];
   @override
   Widget build(BuildContext context) {
+    final authServices = Provider.of<AuthServices>(context);
+    final usuario = authServices.usuario;
+
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -34,11 +40,16 @@ class _UsuariosPageState extends State<UsuariosPage> {
               // ),s
             )
           ],
-          title: const Text('Mi Nombre'),
+          title: Text(usuario.nombre),
           elevation: 1,
           // backgroundColor: Colors.white,
-          leading:
-              IconButton(onPressed: () {}, icon: const Icon(Icons.exit_to_app)),
+          leading: IconButton(
+              onPressed: () {
+                //TODO desconectarme del socket
+                Navigator.pushReplacementNamed(context, 'login');
+                AuthServices.deleteToken();
+              },
+              icon: const Icon(Icons.exit_to_app)),
         ),
         body: SmartRefresher(
           controller: _refreshController,
